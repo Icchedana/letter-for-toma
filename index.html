@@ -2,83 +2,83 @@
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>A Letter Just For You | Toma 🌸</title>
   
-  <!-- Google Fonts: Hind Siliguri, Cinzel Decorative & Inter -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
   
-  <!-- Canvas Confetti Library -->
+  <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
     :root {
-      --primary-accent: #ff85a1;
-      --secondary-accent: #fbb1bd;
-      --glass-border: rgba(255, 255, 255, 0.15);
-      --glass-bg: rgba(20, 16, 28, 0.65);
+      --primary-accent: #ff758f;
+      --secondary-accent: #ffb3c1;
+      --envelope-dark: #1f142b;
+      --envelope-mid: #2d1b3f;
+      --envelope-light: #3d2456;
       --paper-bg: #fffdfa;
       --ink-color: #2b2327;
-      --accent-ink: #7b2cbf;
+      --accent-ink: #591a75;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
       min-height: 100vh;
-      background: radial-gradient(circle at 10% 20%, #150d2a 0%, #0b0712 90%);
+      min-height: 100dvh; /* Perfect dynamic viewport for iOS Safari */
+      background: radial-gradient(circle at 10% 20%, #170d2b 0%, #0a0614 90%);
       display: flex;
       justify-content: center;
       align-items: center;
       font-family: 'Hind Siliguri', sans-serif;
       overflow-x: hidden;
       color: #fff;
-      padding: 24px;
+      padding: env(safe-area-inset-top, 20px) env(safe-area-inset-right, 16px) env(safe-area-inset-bottom, 20px) env(safe-area-inset-left, 16px);
       perspective: 1200px;
     }
 
-    /* Ambient Glow Blobs */
+    /* Ambient Aurora Glow */
     .glow-blob {
       position: fixed;
       border-radius: 50%;
-      filter: blur(100px);
+      filter: blur(80px);
       z-index: 1;
       pointer-events: none;
-      opacity: 0.45;
-      animation: floatGlow 14s infinite alternate ease-in-out;
+      opacity: 0.4;
+      animation: floatGlow 12s infinite alternate ease-in-out;
     }
 
     .blob-1 {
-      top: 10%;
-      left: 15%;
-      width: 320px;
-      height: 320px;
+      top: 5%;
+      left: 10%;
+      width: 280px;
+      height: 280px;
       background: #7209b7;
     }
 
     .blob-2 {
-      bottom: 12%;
-      right: 15%;
-      width: 360px;
-      height: 360px;
+      bottom: 10%;
+      right: 10%;
+      width: 320px;
+      height: 320px;
       background: #f72585;
-      animation-delay: -5s;
+      animation-delay: -4s;
     }
 
     @keyframes floatGlow {
       0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(60px, -40px) scale(1.15); }
-      100% { transform: translate(-40px, 50px) scale(0.9); }
+      100% { transform: translate(30px, -30px) scale(1.15); }
     }
 
-    /* Background Interactive Canvas */
     #sparkle-canvas {
       position: fixed;
       top: 0;
@@ -96,49 +96,43 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 24px;
+      gap: 18px;
+      width: 100%;
+      max-width: 420px;
     }
 
     .status-badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 18px;
+      padding: 10px 20px;
       border-radius: 50px;
       background: rgba(255, 255, 255, 0.08);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       font-size: 0.92rem;
-      letter-spacing: 0.5px;
       color: var(--secondary-accent);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
       cursor: pointer;
       transition: all 0.3s ease;
+      text-align: center;
     }
 
-    .status-badge:hover {
-      background: rgba(255, 255, 255, 0.15);
-      transform: translateY(-2px);
-    }
-
-    /* Envelope Architecture */
+    /* Envelope Base */
     .envelope-box {
       position: relative;
-      width: 350px;
-      height: 230px;
-      background: linear-gradient(135deg, #2a1b3d 0%, #1e132b 100%);
-      border-radius: 0 0 16px 16px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(247, 37, 133, 0.15);
+      width: 330px;
+      height: 220px;
+      background: linear-gradient(135deg, var(--envelope-mid) 0%, var(--envelope-dark) 100%);
+      border-radius: 0 0 18px 18px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(247, 37, 133, 0.18);
       border: 1px solid rgba(255, 255, 255, 0.1);
       cursor: pointer;
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    .envelope-box:hover {
-      transform: translateY(-6px) scale(1.02);
-    }
-
-    /* Flap Top */
+    /* Top Flap */
     .envelope-box::before {
       content: '';
       position: absolute;
@@ -146,28 +140,28 @@
       left: 0;
       width: 0;
       height: 0;
-      border-left: 175px solid transparent;
-      border-right: 175px solid transparent;
-      border-top: 135px solid #3c2456;
+      border-left: 165px solid transparent;
+      border-right: 165px solid transparent;
+      border-top: 130px solid var(--envelope-light);
       transform-origin: top;
-      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.1s, z-index 0.2s 0.3s;
+      transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1) 0.1s, z-index 0.2s 0.3s;
       z-index: 5;
       border-radius: 8px 8px 0 0;
-      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
     }
 
-    /* Pocket Front Overlays */
+    /* Pocket Front */
     .envelope-front-fold {
       position: absolute;
       bottom: 0;
       left: 0;
       width: 0;
       height: 0;
-      border-left: 175px solid #231633;
-      border-right: 175px solid #28193a;
-      border-bottom: 125px solid #311e47;
-      border-top: 105px solid transparent;
-      border-radius: 0 0 16px 16px;
+      border-left: 165px solid #231535;
+      border-right: 165px solid #29183d;
+      border-bottom: 120px solid #321c49;
+      border-top: 100px solid transparent;
+      border-radius: 0 0 18px 18px;
       z-index: 4;
       pointer-events: none;
     }
@@ -175,14 +169,14 @@
     /* Wax Stamp Seal */
     .wax-seal {
       position: absolute;
-      top: 110px;
+      top: 105px;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 55px;
-      height: 55px;
+      width: 54px;
+      height: 54px;
       background: radial-gradient(circle, #ff4d6d 0%, #c9184a 100%);
       border-radius: 50%;
-      box-shadow: 0 6px 20px rgba(201, 24, 74, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+      box-shadow: 0 6px 18px rgba(201, 24, 74, 0.65), inset 0 2px 4px rgba(255, 255, 255, 0.4);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -197,35 +191,35 @@
       50% { transform: translate(-50%, -50%) scale(1.08); }
     }
 
-    /* The Parchment Letter */
+    /* The Letter Paper */
     .letter-paper {
       position: absolute;
       top: 10px;
-      left: 12px;
-      width: 326px;
-      height: 205px;
+      left: 10px;
+      width: 310px;
+      height: 200px;
       background: var(--paper-bg);
-      background-image: radial-gradient(#ece4db 1px, transparent 1px);
+      background-image: radial-gradient(#eadfd7 1.2px, transparent 1.2px);
       background-size: 16px 16px;
       border-radius: 12px;
-      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
       z-index: 3;
-      padding: 30px 24px;
+      padding: 22px 18px;
       color: var(--ink-color);
-      transition: all 0.8s cubic-bezier(0.34, 1.3, 0.64, 1);
-      overflow-y: hidden;
+      transition: all 0.75s cubic-bezier(0.34, 1.2, 0.64, 1);
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       user-select: text;
     }
 
     .letter-header {
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       font-weight: 700;
       color: var(--accent-ink);
       border-bottom: 2px dashed #eed9d9;
-      padding-bottom: 10px;
-      margin-bottom: 16px;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
       display: flex;
       justify-content: space-between;
       align-items: baseline;
@@ -233,24 +227,23 @@
 
     .letter-header span {
       font-family: 'Cinzel Decorative', cursive;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       color: #9d8189;
     }
 
     .letter-content {
-      font-size: 0.98rem;
+      font-size: 0.96rem;
       line-height: 1.85;
       text-align: justify;
       white-space: pre-line;
       flex-grow: 1;
-      font-weight: 400;
       color: #33272d;
     }
 
     .letter-signature {
-      margin-top: 24px;
+      margin-top: 20px;
       text-align: right;
-      font-size: 1rem;
+      font-size: 0.98rem;
       color: var(--accent-ink);
       line-height: 1.4;
       font-family: 'Playfair Display', serif;
@@ -264,32 +257,63 @@
       -webkit-text-fill-color: transparent;
     }
 
-    /* Open State Transformations */
+    /* Reply Section at bottom of letter */
+    .reply-action-box {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #fae1dd;
+      text-align: center;
+    }
+
+    .reply-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, #7209b7 0%, #f72585 100%);
+      color: #ffffff !important;
+      text-decoration: none;
+      font-size: 0.98rem;
+      font-weight: 600;
+      border-radius: 12px;
+      box-shadow: 0 8px 18px rgba(247, 37, 133, 0.35);
+      transition: all 0.3s ease;
+    }
+
+    .reply-btn:active {
+      transform: scale(0.97);
+      filter: brightness(0.92);
+    }
+
+    /* Open State */
     .envelope-box.is-open::before {
       transform: rotateX(180deg);
       z-index: 2;
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), z-index 0.2s 0.2s;
+      transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1), z-index 0.2s 0.2s;
     }
 
     .envelope-box.is-open .wax-seal {
       opacity: 0;
-      transform: translate(-50%, -50%) scale(0.3) rotate(45deg);
+      transform: translate(-50%, -50%) scale(0.2);
       pointer-events: none;
     }
 
     .envelope-box.is-open .letter-paper {
       top: -240px;
-      left: -12px;
-      width: 374px;
-      height: 560px;
-      max-height: 80vh;
+      left: -15px;
+      width: 360px;
+      height: 600px;
+      max-height: 75vh;
       overflow-y: auto;
       z-index: 10;
       transform: scale(1.02);
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 133, 161, 0.2);
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 117, 143, 0.25);
+      -webkit-overflow-scrolling: touch;
     }
 
-    /* Soft Scrollbar */
+    /* Scrollbar */
     .letter-paper::-webkit-scrollbar {
       width: 4px;
     }
@@ -298,16 +322,16 @@
       border-radius: 10px;
     }
 
-    /* Responsive adjustments */
-    @media (max-width: 480px) {
+    /* iPhone / Small Screens Optimization */
+    @media (max-width: 400px) {
       .envelope-box {
         width: 300px;
-        height: 200px;
+        height: 205px;
       }
       .envelope-box::before {
         border-left-width: 150px;
         border-right-width: 150px;
-        border-top-width: 115px;
+        border-top-width: 120px;
       }
       .envelope-front-fold {
         border-left-width: 150px;
@@ -316,30 +340,35 @@
         border-top-width: 90px;
       }
       .letter-paper {
-        width: 276px;
-        height: 180px;
-        padding: 20px 16px;
+        width: 280px;
+        height: 185px;
       }
       .envelope-box.is-open .letter-paper {
         left: -15px;
         width: 330px;
-        top: -190px;
+        top: -200px;
+        max-height: 72vh;
+        padding: 20px 14px;
+      }
+      .letter-content {
+        font-size: 0.92rem;
+        line-height: 1.8;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Ambient Glow Elements -->
+  <!-- Ambient Glow -->
   <div class="glow-blob blob-1"></div>
   <div class="glow-blob blob-2"></div>
 
-  <!-- Interactive Sparkles Canvas -->
+  <!-- Sparkle Particle Canvas -->
   <canvas id="sparkle-canvas"></canvas>
 
   <div class="experience-container">
     <div class="status-badge" id="actionBtn">
-      <span>✨</span> <span id="badgeText">একটি বিশেষ চিঠি — ক্লিক করো</span>
+      <span>✨</span> <span id="badgeText">চিঠিটি খুলতে খামে ট্যাপ করো</span>
     </div>
 
     <div class="envelope-box" id="envelope">
@@ -352,19 +381,26 @@
         </div>
         
         <div class="letter-content">
-হাজারটা ইন্সট্যান্ট মেসেজ আর অনবরত নোটিফিকেশনের ভিড়ে আজকের দিনে কাগজের ভাঁজে পাঠানো চিঠির সেই অমূল্য অনুভূতি আমরা প্রায় ভুলতেই বসেছি। তাই চিঠি দিবসের এই প্রহরে ভাবলাম, প্রযুক্তির পর্দায় হলেও কিছু অকৃত্রিম অনুভূতি অক্ষরের রঙে সাজিয়ে শুধুই তোমার কাছে পাঠাই।
+হাজারটা দ্রুতগতির মেসেজ আর অনবরত নোটিফিকেশনের ভিড়ে আজকের দিনে কাগজের ভাঁজে পাঠানো চিঠির সেই মায়াবী অনুভূতি আমরা প্রায় ভুলতেই বসেছি। তাই চিঠি দিবসের এই প্রহরে ভাবলাম, পর্দার ওপারে হলেও কিছু অকৃত্রিম অনুভূতি অক্ষরের রঙে সাজিয়ে তোমার জন্য রেখে দিই।
 
-আমাদের দিনগুলো কত অদ্ভুত দ্রুততায় বয়ে যায়—ল্যাব, অ্যাসাইনমেন্ট আর ভবিষ্যৎ গড়ার হাজারো ব্যস্ততা। কিন্তু এতসব কোলাহল আর অনিশ্চয়তার মাঝেও তোমার মতো একজন নির্ভেজাল, প্রাণবন্ত বন্ধু পাশে থাকা মানে এক টুকরো প্রশান্তির ছায়া। কোনো বিষয়ের গভীরে হারিয়ে গিয়ে ঘণ্টার পর ঘণ্টা আলোচনা, তুচ্ছাতিতুচ্ছ বিষয় নিয়ে নির্ভেজাল আড্ডা আর একে অপরকে নিঃশর্তভাবে ভরসা দেওয়ার এই আবহটুকু সত্যি বিরল। 
+আমাদের দিনগুলো কত অবিশ্বাস্য দ্রুততায় বয়ে যায়—ক্লাস, জটিল অ্যাসাইনমেন্ট, ক্যারিয়ার আর ভবিষ্যৎ গড়ার অবিরাম ব্যস্ততা। কিন্তু এতসব কোলাহলের মাঝেও তোমার মতো একজন নির্ভেজাল, প্রাণবন্ত বন্ধু পাশে থাকা মানে এক টুকরো নিশ্চিত স্বস্তি। যেকোনো বিষয় নিয়ে গভীর আলোচনা, নির্ভেজাল আড্ডা আর একে অপরকে নিঃশর্তভাবে ভরসা দেওয়ার এই আবহটুকু সত্যিই অনেক দামি।
 
-জীবন হয়তো আমাদের একেকজনকে ভিন্ন ভিন্ন সফলতার গন্তব্যে নিয়ে দাঁড় করাবে, চেনা রুটিন বদলে যাবে নতুন ব্যস্ততায়। তবুও দিনশেষে সময়ের ব্যবধান কিংবা দূরত্বের সীমানা যাই হোক—আমাদের এই বন্ধুত্বের সরল সমীকরণটা যেন ঠিক এই মুহূর্তের মতোই উজ্জ্বল ও অটুট থাকে। 
+জীবন হয়তো আমাদের একেকজনকে ভিন্ন ভিন্ন সফলতার গন্তব্যে নিয়ে দাঁড় করাবে, চেনা দিনগুলো হয়তো একসময় বদলে যাবে আরও বড় কোনো ব্যস্ততায়। তবুও দিনশেষে সময়ের ব্যবধান কিংবা দূরত্বের সীমানা যাই হোক—বন্ধুত্বের এই সহজ আর অমলিন রূপটা যেন আজীবন ঠিক আগের মতোই থাকে।
 
-তোমার চোখের সব স্বপ্ন বাস্তবে ধরা দিক, প্রতিটি পদক্ষেপে আসুক কাঙ্ক্ষিত প্রাপ্তি। সবসময় ঠিক এইভাবেই আত্মবিশ্বাসী আর অমলিন হাসিতে থেকো।
+তোমার সব স্বপ্ন বাস্তবে রূপ নিক, প্রতিটি পদক্ষেপে আসুক কাঙ্ক্ষিত সাফল্য। সবসময় ঠিক এভাবেই আত্মবিশ্বাসী আর হাসিখুশি থেকো।
         </div>
 
         <div class="letter-signature">
           হৃদয়গ্রাহী শুভকামনায়,<br>
-          তোমার বিশ্বস্ত বন্ধু<br>
+          তোমার বন্ধু<br>
           <strong>সারমান</strong>
+        </div>
+
+        <!-- Email Reply Section -->
+        <div class="reply-action-box">
+          <a href="mailto:aksarman962@gmail.com?subject=%E0%A6%9A%E0%A6%BF%E0%A6%A0%E0%A6%BF%E0%A6%B0%20%E0%A6%89%E0%A6%A4%E0%A7%8D%E0%A6%A4%E0%A6%B0%20%E0%A7%A4%20From%20Toma&body=%E0%A6%AA%E0%A7%8D%E0%A6%B0%E0%A6%BF%E0%A7%9F%20%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A6%AE%E0%A6%BE%E0%A6%A8%2C%0A%0A%E0%A6%A4%E0%A7%8B%E0%A6%AE%E0%A6%BE%E0%A6%B0%20%E0%A6%9A%E0%A6%BF%E0%A6%A0%E0%A6%BF%E0%A6%9F%E0%A6%BF%20%E0%A6%AA%E0%A7%9Call...%0A" class="reply-btn">
+            ✉️ চিঠির উত্তর দাও (Reply via Email)
+          </a>
         </div>
       </div>
 
@@ -378,28 +414,26 @@
     const letterPaper = document.getElementById('letterPaper');
     let isOpen = false;
 
-    // Envelope Toggle with Confetti Blast
+    // Toggle Letter Open/Close
     envelope.addEventListener('click', (e) => {
+      // Don't close if user is clicking inside the letter or on the reply button
       if (isOpen && letterPaper.contains(e.target)) return;
 
       isOpen = !isOpen;
       envelope.classList.toggle('is-open', isOpen);
 
       if (isOpen) {
-        badgeText.innerText = '🌸 চিঠিটি বন্ধ করতে বাইরে ক্লিক করো';
+        badgeText.innerText = '🌸 চিঠিটি বন্ধ করতে বাইরে ট্যাপ করো';
         triggerMagicalConfetti();
       } else {
-        badgeText.innerText = 'তমার জন্য একটি বিশেষ চিঠি — ক্লিক করো';
+        badgeText.innerText = 'চিঠিটি খুলতে খামে ট্যাপ করো';
       }
     });
 
-    // Confetti Burst Function
+    // Confetti on open
     function triggerMagicalConfetti() {
-      const count = 180;
-      const defaults = {
-        origin: { y: 0.7 },
-        zIndex: 999
-      };
+      const count = 160;
+      const defaults = { origin: { y: 0.7 }, zIndex: 999 };
 
       function fire(particleRatio, opts) {
         confetti(Object.assign({}, defaults, opts, {
@@ -407,13 +441,13 @@
         }));
       }
 
-      fire(0.25, { spread: 26, startVelocity: 55, colors: ['#ff85a1', '#fbb1bd'] });
+      fire(0.25, { spread: 26, startVelocity: 50, colors: ['#ff758f', '#ffb3c1'] });
       fire(0.2, { spread: 60, colors: ['#ffffff', '#ffd166'] });
       fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8, colors: ['#7209b7', '#f72585'] });
       fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, colors: ['#e2afff'] });
     }
 
-    // Sparkle Canvas Logic
+    // Touch and Cursor Sparkles
     const canvas = document.getElementById('sparkle-canvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
@@ -433,8 +467,8 @@
         this.speedX = (Math.random() - 0.5) * 2;
         this.speedY = (Math.random() - 0.5) * 2 - 0.5;
         this.opacity = 1;
-        this.decay = Math.random() * 0.02 + 0.01;
-        this.color = ['#ff85a1', '#ffd166', '#a2d2ff', '#ffffff'][Math.floor(Math.random() * 4)];
+        this.decay = Math.random() * 0.02 + 0.015;
+        this.color = ['#ff758f', '#ffd166', '#a2d2ff', '#ffffff'][Math.floor(Math.random() * 4)];
       }
       update() {
         this.x += this.speedX;
@@ -452,9 +486,16 @@
       }
     }
 
-    window.addEventListener('pointermove', (e) => {
+    const addParticles = (x, y) => {
       for (let i = 0; i < 2; i++) {
-        particles.push(new Sparkle(e.clientX, e.clientY));
+        particles.push(new Sparkle(x, y));
+      }
+    };
+
+    window.addEventListener('pointermove', (e) => addParticles(e.clientX, e.clientY));
+    window.addEventListener('touchstart', (e) => {
+      if(e.touches.length > 0) {
+        addParticles(e.touches[0].clientX, e.touches[0].clientY);
       }
     });
 
