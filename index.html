@@ -34,8 +34,8 @@
 
     body {
       min-height: 100vh;
-      min-height: 100dvh; /* Perfect dynamic viewport for iOS Safari */
-      background: radial-gradient(circle at 10% 20%, #170d2b 0%, #0a0614 90%);
+      min-height: 100dvh;
+      background: radial-gradient(circle at 10% 20%, #1a0b2e 0%, #0d0617 90%);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -44,16 +44,17 @@
       color: #fff;
       padding: env(safe-area-inset-top, 20px) env(safe-area-inset-right, 16px) env(safe-area-inset-bottom, 20px) env(safe-area-inset-left, 16px);
       perspective: 1200px;
+      position: relative;
     }
 
     /* Ambient Aurora Glow */
     .glow-blob {
       position: fixed;
       border-radius: 50%;
-      filter: blur(80px);
+      filter: blur(90px);
       z-index: 1;
       pointer-events: none;
-      opacity: 0.4;
+      opacity: 0.35;
       animation: floatGlow 12s infinite alternate ease-in-out;
     }
 
@@ -79,7 +80,8 @@
       100% { transform: translate(30px, -30px) scale(1.15); }
     }
 
-    #sparkle-canvas {
+    /* Fullscreen Hearts Canvas */
+    #hearts-canvas {
       position: fixed;
       top: 0;
       left: 0;
@@ -105,7 +107,7 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 20px;
+      padding: 10px 22px;
       border-radius: 50px;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.15);
@@ -126,7 +128,7 @@
       height: 220px;
       background: linear-gradient(135deg, var(--envelope-mid) 0%, var(--envelope-dark) 100%);
       border-radius: 0 0 18px 18px;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(247, 37, 133, 0.18);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), 0 0 35px rgba(247, 37, 133, 0.25);
       border: 1px solid rgba(255, 255, 255, 0.1);
       cursor: pointer;
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -257,7 +259,7 @@
       -webkit-text-fill-color: transparent;
     }
 
-    /* Reply Section at bottom of letter */
+    /* Reply Section */
     .reply-action-box {
       margin-top: 24px;
       padding-top: 16px;
@@ -309,11 +311,10 @@
       overflow-y: auto;
       z-index: 10;
       transform: scale(1.02);
-      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 117, 143, 0.25);
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 117, 143, 0.35);
       -webkit-overflow-scrolling: touch;
     }
 
-    /* Scrollbar */
     .letter-paper::-webkit-scrollbar {
       width: 4px;
     }
@@ -322,7 +323,7 @@
       border-radius: 10px;
     }
 
-    /* iPhone / Small Screens Optimization */
+    /* iPhone & Responsive */
     @media (max-width: 400px) {
       .envelope-box {
         width: 300px;
@@ -359,16 +360,16 @@
 </head>
 <body>
 
-  <!-- Ambient Glow -->
+  <!-- Aurora Glow -->
   <div class="glow-blob blob-1"></div>
   <div class="glow-blob blob-2"></div>
 
-  <!-- Sparkle Particle Canvas -->
-  <canvas id="sparkle-canvas"></canvas>
+  <!-- Fullscreen Animated Floating Hearts Canvas -->
+  <canvas id="hearts-canvas"></canvas>
 
   <div class="experience-container">
     <div class="status-badge" id="actionBtn">
-      <span>✨</span> <span id="badgeText">চিঠিটি খুলতে খামে ট্যাপ করো</span>
+      <span>💖</span> <span id="badgeText">চিঠিটি খুলতে খামে ট্যাপ করো</span>
     </div>
 
     <div class="envelope-box" id="envelope">
@@ -414,21 +415,133 @@
     const letterPaper = document.getElementById('letterPaper');
     let isOpen = false;
 
-    // Toggle Letter Open/Close
-    envelope.addEventListener('click', (e) => {
-      // Don't close if user is clicking inside the letter or on the reply button
-      if (isOpen && letterPaper.contains(e.target)) return;
+    // Helper to draw clean vector heart path
+    function drawHeart(context, x, y, size, color, alpha, angle) {
+      context.save();
+      context.translate(x, y);
+      context.rotate(angle);
+      context.scale(size / 15, size / 15);
+      context.globalAlpha = Math.max(0, Math.min(1, alpha));
+      context.fillStyle = color;
 
-      isOpen = !isOpen;
-      envelope.classList.toggle('is-open', isOpen);
+      context.beginPath();
+      context.moveTo(0, 0);
+      context.bezierCurveTo(-10, -10, -20, 5, 0, 20);
+      context.bezierCurveTo(20, 5, 10, -10, 0, 0);
+      context.closePath();
+      context.fill();
+      context.restore();
+    }
 
-      if (isOpen) {
-        badgeText.innerText = '🌸 চিঠিটি বন্ধ করতে বাইরে ট্যাপ করো';
-        triggerMagicalConfetti();
-      } else {
-        badgeText.innerText = 'চিঠিটি খুলতে খামে ট্যাপ করো';
+    const heartColors = [
+      '#ff4d6d', '#ff758f', '#ff85a1', '#f72585', 
+      '#b5179e', '#ffccd5', '#ffffff', '#e0aaff', '#ffd166'
+    ];
+
+    // ==========================================
+    // Dynamic Hearts Canvas Engine
+    // ==========================================
+    const canvas = document.getElementById('hearts-canvas');
+    const ctx = canvas.getContext('2d');
+    let hearts = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Heart {
+      constructor(x, y, mode = 'ambient') {
+        this.color = heartColors[Math.floor(Math.random() * heartColors.length)];
+        this.angle = (Math.random() - 0.5) * 0.4;
+        this.angularSpeed = (Math.random() - 0.5) * 0.03;
+
+        if (mode === 'fountain') {
+          // Explode upwards and outward from the envelope center
+          this.x = x + (Math.random() - 0.5) * 40;
+          this.y = y + (Math.random() - 0.5) * 20;
+          this.size = Math.random() * 20 + 12;
+          const spreadAngle = -Math.PI / 2 + (Math.random() - 0.5) * (Math.PI * 0.85);
+          const velocity = Math.random() * 10 + 6;
+          this.speedX = Math.cos(spreadAngle) * velocity;
+          this.speedY = Math.sin(spreadAngle) * velocity;
+          this.gravity = 0.12;
+          this.alpha = 1;
+          this.decay = Math.random() * 0.012 + 0.008;
+          this.mode = 'burst';
+        } else if (mode === 'burst') {
+          this.x = x;
+          this.y = y;
+          this.size = Math.random() * 16 + 10;
+          const angle = Math.random() * Math.PI * 2;
+          const speed = Math.random() * 6 + 2;
+          this.speedX = Math.cos(angle) * speed;
+          this.speedY = Math.sin(angle) * speed;
+          this.gravity = 0.06;
+          this.alpha = 1;
+          this.decay = Math.random() * 0.02 + 0.015;
+          this.mode = 'burst';
+        } else {
+          // Ambient background float
+          this.x = x !== undefined ? x : Math.random() * canvas.width;
+          this.y = y !== undefined ? y : canvas.height + (Math.random() * 50 + 20);
+          this.size = Math.random() * 14 + 10;
+          this.alpha = Math.random() * 0.5 + 0.35;
+          this.swingAmp = Math.random() * 2 + 1;
+          this.swingFreq = Math.random() * 0.03 + 0.01;
+          this.time = Math.random() * 100;
+          this.speedY = -(Math.random() * 1.5 + 0.8);
+          this.speedX = 0;
+          this.mode = 'ambient';
+        }
       }
-    });
+
+      update() {
+        if (this.mode === 'burst') {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          this.speedY += this.gravity;
+          this.alpha -= this.decay;
+        } else {
+          this.time += this.swingFreq;
+          this.y += this.speedY;
+          this.x += Math.sin(this.time) * this.swingAmp;
+        }
+        this.angle += this.angularSpeed;
+      }
+
+      draw() {
+        drawHeart(ctx, this.x, this.y, this.size, this.color, this.alpha, this.angle);
+      }
+    }
+
+    // Huge Heart Fountain burst from envelope center
+    function shootHeartFountain() {
+      const rect = envelope.getBoundingClientRect();
+      const originX = rect.left + rect.width / 2;
+      const originY = rect.top + rect.height / 2;
+
+      // Wave 1: Immediate big explosion
+      for (let i = 0; i < 45; i++) {
+        hearts.push(new Heart(originX, originY, 'fountain'));
+      }
+
+      // Wave 2: Rising secondary rush
+      setTimeout(() => {
+        for (let i = 0; i < 35; i++) {
+          hearts.push(new Heart(originX, originY - 30, 'fountain'));
+        }
+      }, 180);
+
+      // Wave 3: Lingering floating sparks
+      setTimeout(() => {
+        for (let i = 0; i < 30; i++) {
+          hearts.push(new Heart(originX, originY - 60, 'fountain'));
+        }
+      }, 350);
+    }
 
     // Confetti on open
     function triggerMagicalConfetti() {
@@ -447,71 +560,68 @@
       fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, colors: ['#e2afff'] });
     }
 
-    // Touch and Cursor Sparkles
-    const canvas = document.getElementById('sparkle-canvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
+    // Envelope Toggle
+    envelope.addEventListener('click', (e) => {
+      if (isOpen && letterPaper.contains(e.target)) return;
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+      isOpen = !isOpen;
+      envelope.classList.toggle('is-open', isOpen);
 
-    class Sparkle {
-      constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.size = Math.random() * 3 + 1;
-        this.speedX = (Math.random() - 0.5) * 2;
-        this.speedY = (Math.random() - 0.5) * 2 - 0.5;
-        this.opacity = 1;
-        this.decay = Math.random() * 0.02 + 0.015;
-        this.color = ['#ff758f', '#ffd166', '#a2d2ff', '#ffffff'][Math.floor(Math.random() * 4)];
-      }
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        this.opacity -= this.decay;
-      }
-      draw() {
-        ctx.save();
-        ctx.globalAlpha = Math.max(this.opacity, 0);
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-    }
-
-    const addParticles = (x, y) => {
-      for (let i = 0; i < 2; i++) {
-        particles.push(new Sparkle(x, y));
-      }
-    };
-
-    window.addEventListener('pointermove', (e) => addParticles(e.clientX, e.clientY));
-    window.addEventListener('touchstart', (e) => {
-      if(e.touches.length > 0) {
-        addParticles(e.touches[0].clientX, e.touches[0].clientY);
+      if (isOpen) {
+        badgeText.innerText = '🌸 চিঠিটি বন্ধ করতে বাইরে ট্যাপ করো';
+        shootHeartFountain();
+        triggerMagicalConfetti();
+      } else {
+        badgeText.innerText = 'চিঠিটি খুলতে খামে ট্যাপ করো';
       }
     });
 
-    function animateSparkles() {
+    // Spawn ambient hearts in background
+    function spawnAmbientHearts() {
+      if (hearts.length < 60) {
+        hearts.push(new Heart());
+      }
+    }
+    setInterval(spawnAmbientHearts, 180);
+
+    for (let i = 0; i < 35; i++) {
+      const h = new Heart();
+      h.y = Math.random() * canvas.height;
+      hearts.push(h);
+    }
+
+    // Interactive Tap Hearts
+    function popHeartsAt(x, y) {
+      for (let i = 0; i < 6; i++) {
+        hearts.push(new Heart(x, y, 'burst'));
+      }
+    }
+
+    window.addEventListener('pointerdown', (e) => popHeartsAt(e.clientX, e.clientY));
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 0) {
+        popHeartsAt(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    });
+
+    // Animation Loop
+    function animate() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (let i = 0; i < particles.length; i++) {
-        particles[i].update();
-        particles[i].draw();
-        if (particles[i].opacity <= 0) {
-          particles.splice(i, 1);
+      for (let i = 0; i < hearts.length; i++) {
+        hearts[i].update();
+        hearts[i].draw();
+
+        if (hearts[i].mode === 'burst' && hearts[i].alpha <= 0) {
+          hearts.splice(i, 1);
+          i--;
+        } else if (hearts[i].mode === 'ambient' && hearts[i].y < -60) {
+          hearts.splice(i, 1);
           i--;
         }
       }
-      requestAnimationFrame(animateSparkles);
+      requestAnimationFrame(animate);
     }
-    animateSparkles();
+    animate();
   </script>
 </body>
 </html>
